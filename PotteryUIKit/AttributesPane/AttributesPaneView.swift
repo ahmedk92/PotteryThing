@@ -11,6 +11,7 @@ final class AttributesPaneView: UIView {
     
     var didTapDiscColorButton: (() -> Void)?
     var didTapBrushColorButton: (() -> Void)?
+    var brushSizeValueChanged: ((Float) -> Void)?
     
     private var verticalStackView: UIStackView!
     
@@ -18,6 +19,7 @@ final class AttributesPaneView: UIView {
         super.init(frame: frame)
         setUpStackView()
         addDiscColorButton()
+        addBrushSizeSlider()
     }
     
     @available(*, unavailable)
@@ -43,6 +45,15 @@ final class AttributesPaneView: UIView {
         addButton(title: "Brush color", selector: #selector(brushColorButtonTapped))
     }
     
+    private func addBrushSizeSlider() {
+        let slider = UISlider()
+        slider.minimumValue = 0.1
+        slider.maximumValue = 10
+        slider.value = 1
+        slider.addTarget(self, action: #selector(brushSizeValueChangedSelector), for: .valueChanged)
+        verticalStackView.addArrangedSubview(slider)
+    }
+    
     private func addButton(title: String, selector: Selector) {
         let button = UIButton()
         button.setTitle(title, for: .normal)
@@ -56,5 +67,9 @@ final class AttributesPaneView: UIView {
     
     @objc private func brushColorButtonTapped() {
         didTapBrushColorButton?()
+    }
+    
+    @objc private func brushSizeValueChangedSelector(_ slider: UISlider) {
+        brushSizeValueChanged?(slider.value)
     }
 }
