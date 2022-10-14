@@ -15,12 +15,13 @@ final class DiscView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        setUpDiscLayer()
         rotate()
     }
     
     var discColor: UIColor = .white {
         didSet {
-            setNeedsDisplay()
+            updateDiscLayerColor()
         }
     }
     
@@ -38,53 +39,64 @@ final class DiscView: UIView {
     
     var rotationSpeed: CGFloat = 0.05
     
-    private var previousTouchPoints: [[CGPoint]] = []
     private var currentTouchPoints: [CGPoint] = []
     private var currentPoint: CGPoint?
     private var rotationAngle: CGFloat = 0
-    
-    override func draw(_ rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()!
-        context.clear(bounds)
-        drawCircle(context: context)
-        drawTouches(context: context)
-    }
+    private var discLayer: CAShapeLayer!
+    private var currentPathLayer: CAShapeLayer?
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        previousTouchPoints.append(currentTouchPoints)
         currentTouchPoints = touches.map { $0.location(in: self) }
         currentPoint = touches.first?.location(in: nil)
-        setNeedsDisplay()
+        drawTouches()
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesMoved(touches, with: event)
         currentTouchPoints.append(contentsOf: touches.map { $0.location(in: self) })
         currentPoint = touches.first?.location(in: nil)
-        setNeedsDisplay()
+        drawTouches()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
         currentTouchPoints.append(contentsOf: touches.map { $0.location(in: self) })
         currentPoint = nil
-        setNeedsDisplay()
+        currentPathLayer = nil
+        drawTouches()
     }
     
-    private func drawTouches(context: CGContext) {
-        drawPreviousTouches(context: context)
-        drawCurrentTouches(context: context)
-        drawCurrentTouches(context: context)
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        redrawDisc()
     }
     
-    private func drawPreviousTouches(context: CGContext) {
-        for touchPoints in previousTouchPoints {
-            drawTouches(touchPoints, context: context)
-        }
+    private func redrawDisc() {
+        let discLayerFrame = centeredSquare()
+        discLayer.frame = discLayerFrame
+        discLayer.path = makeDiscPath(frame: discLayerFrame)
     }
     
-    private func drawTouches(_ touches: [CGPoint], context: CGContext) {
+    private func makeDiscPath(frame: CGRect) -> CGPath {
+        UIBezierPath(ovalIn: frame).cgPath
+    }
+    
+    private func setUpDiscLayer() {
+        discLayer = CAShapeLayer()
+        layer.addSublayer(discLayer)
+        updateDiscLayerColor()
+    }
+    
+    private func updateDiscLayerColor() {
+        discLayer.fillColor = discColor.cgColor
+    }
+    
+    private func drawTouches() {
+        drawTouches(currentTouchPoints)
+    }
+    
+    private func drawTouches(_ touches: [CGPoint]) {
         guard let firstTouch = touches.first else { return }
         let path = UIBezierPath()
         path.move(to: firstTouch)
@@ -92,15 +104,16 @@ final class DiscView: UIView {
             path.addLine(to: touch)
         }
         
-        context.setStrokeColor(brushColor.cgColor)
-        context.setLineWidth(brushSize)
-        context.setLineCap(.round)
-        context.addPath(path.cgPath)
-        context.strokePath()
-    }
-    
-    private func drawCurrentTouches(context: CGContext) {
-        drawTouches(currentTouchPoints, context: context)
+        let shapeLayer = currentPathLayer ?? CAShapeLayer()
+        shapeLayer.strokeColor = brushColor.cgColor
+        shapeLayer.fillColor = UIColor.clear.cgColor
+        shapeLayer.lineWidth = brushSize
+        shapeLayer.lineCap = .round
+        shapeLayer.path = path.cgPath
+        if currentPathLayer == nil {
+            layer.addSublayer(shapeLayer)
+            currentPathLayer = shapeLayer
+        }
     }
     
     private func drawCircle(context: CGContext) {
@@ -140,6 +153,6 @@ final class DiscView: UIView {
         guard let currentPoint = currentPoint else { return }
         let transformedPoint = convert(currentPoint, from: nil)
         currentTouchPoints.append(transformedPoint)
-        setNeedsDisplay()
+        drawTouches()
     }
 }
