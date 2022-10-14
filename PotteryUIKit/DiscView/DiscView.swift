@@ -25,19 +25,11 @@ final class DiscView: UIView {
         }
     }
     
-    var brushColor: UIColor = .black {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
+    var brushColor: UIColor = .black
     
-    var brushSize: CGFloat = 3 {
-        didSet {
-            setNeedsDisplay()
-        }
-    }
+    var brushSize: CGFloat = 3
     
-    var rotationSpeed: CGFloat = 0.05
+    var rotationSpeed: CGFloat = 0.1
     
     private var currentTouchPoints: [CGPoint] = []
     private var currentPoint: CGPoint?
