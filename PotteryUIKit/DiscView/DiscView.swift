@@ -31,6 +31,13 @@ final class DiscView: UIView {
     
     var rotationSpeed: CGFloat = 0.1
     
+    func clear() {
+        currentPathLayer = nil
+        currentPoint = nil
+        currentTouchPoints = []
+        removePathLayers()
+    }
+    
     private var currentTouchPoints: [CGPoint] = []
     private var currentPoint: CGPoint?
     private var rotationAngle: CGFloat = 0
@@ -104,6 +111,7 @@ final class DiscView: UIView {
         shapeLayer.path = path.cgPath
         if currentPathLayer == nil {
             layer.addSublayer(shapeLayer)
+            pathLayers.append(.init(shapeLayer))
             currentPathLayer = shapeLayer
         }
     }
@@ -146,5 +154,20 @@ final class DiscView: UIView {
         let transformedPoint = convert(currentPoint, from: nil)
         currentTouchPoints.append(transformedPoint)
         drawTouches()
+    }
+    
+    private class WeakBox<T: AnyObject> {
+        weak var ref: T?
+        
+        init(_ ref: T) {
+            self.ref = ref
+        }
+    }
+    
+    private var pathLayers: [WeakBox<CALayer>] = []
+    
+    private func removePathLayers() {
+        pathLayers.forEach { $0.ref?.removeFromSuperlayer() }
+        pathLayers.removeAll(keepingCapacity: true)
     }
 }

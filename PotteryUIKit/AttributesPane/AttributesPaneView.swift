@@ -13,6 +13,7 @@ final class AttributesPaneView: UIView {
     var didTapBrushColorButton: (() -> Void)?
     var brushSizeValueChanged: ((Float) -> Void)?
     var speedValueChanged: ((Float) -> Void)?
+    var didTapClearButton: (() -> Void)?
     
     private var verticalStackView: UIStackView!
     
@@ -22,6 +23,7 @@ final class AttributesPaneView: UIView {
         addDiscColorButton()
         addBrushSizeSlider()
         addSpeedSlider()
+        addClearButton()
     }
     
     @available(*, unavailable)
@@ -53,6 +55,10 @@ final class AttributesPaneView: UIView {
     
     private func addSpeedSlider() {
         addSlider(title: "Speed: ", range: (min: 0.01, max: 1, currentValue: 0.1), selector: #selector(speedValueChangedSelector(_:)))
+    }
+    
+    private func addClearButton() {
+        addButton(title: "Clear", selector: #selector(clearButtonTapped))
     }
     
     private func addSlider(title: String, range: (min: Float, max: Float, currentValue: Float), selector: Selector) {
@@ -94,5 +100,9 @@ final class AttributesPaneView: UIView {
     
     @objc private func speedValueChangedSelector(_ slider: UISlider) {
         speedValueChanged?(slider.value)
+    }
+    
+    @objc private func clearButtonTapped() {
+        didTapClearButton?()
     }
 }

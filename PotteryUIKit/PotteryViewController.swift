@@ -48,6 +48,9 @@ final class PotteryViewController: UIViewController, UIColorPickerViewController
         attributesPanView.speedValueChanged = { [weak self] speed in
             self?.discView.rotationSpeed = CGFloat(speed)
         }
+        attributesPanView.didTapClearButton = { [weak self] in
+            self?.discView.clear()
+        }
         attributesPanView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(attributesPanView)
         
