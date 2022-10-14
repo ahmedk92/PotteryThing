@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class PotteryViewController: UIViewController {
+final class PotteryViewController: UIViewController, UIColorPickerViewControllerDelegate {
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -23,6 +23,28 @@ final class PotteryViewController: UIViewController {
         
         view.backgroundColor = .black
         addDiscView()
+        addAttributesPaneView()
+    }
+    
+    private func addAttributesPaneView() {
+        let attributesPanView = AttributesPaneView()
+        attributesPanView.didTapDiscColorButton = { [weak self] in
+            self?.showDiscColorPicker()
+        }
+        attributesPanView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(attributesPanView)
+        
+        NSLayoutConstraint.activate([
+            attributesPanView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            attributesPanView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            attributesPanView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
+        ])
+    }
+    
+    private func showDiscColorPicker() {
+        let colorPickerViewController = UIColorPickerViewController()
+        colorPickerViewController.delegate = self
+        present(colorPickerViewController, animated: true)
     }
     
     private func addDiscView() {
@@ -43,5 +65,9 @@ final class PotteryViewController: UIViewController {
             equalWidthToSuperviewConstraint,
             equalHeitToSuperviewConstraint
         ])
+    }
+    
+    func colorPickerViewController(_ viewController: UIColorPickerViewController, didSelect color: UIColor, continuously: Bool) {
+        discView.discColor = color
     }
 }
