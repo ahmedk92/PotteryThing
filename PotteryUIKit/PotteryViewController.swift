@@ -45,6 +45,9 @@ final class PotteryViewController: UIViewController, UIColorPickerViewController
         attributesPanView.brushSizeValueChanged = { [weak self] brushSize in
             self?.discView.brushSize = CGFloat(brushSize)
         }
+        attributesPanView.speedValueChanged = { [weak self] speed in
+            self?.discView.rotationSpeed = CGFloat(speed)
+        }
         attributesPanView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(attributesPanView)
         

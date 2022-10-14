@@ -12,6 +12,7 @@ final class AttributesPaneView: UIView {
     var didTapDiscColorButton: (() -> Void)?
     var didTapBrushColorButton: (() -> Void)?
     var brushSizeValueChanged: ((Float) -> Void)?
+    var speedValueChanged: ((Float) -> Void)?
     
     private var verticalStackView: UIStackView!
     
@@ -20,6 +21,7 @@ final class AttributesPaneView: UIView {
         setUpStackView()
         addDiscColorButton()
         addBrushSizeSlider()
+        addSpeedSlider()
     }
     
     @available(*, unavailable)
@@ -46,12 +48,29 @@ final class AttributesPaneView: UIView {
     }
     
     private func addBrushSizeSlider() {
+        addSlider(title: "Brush size: ", range: (min: 0.1, max: 10, currentValue: 1), selector: #selector(brushSizeValueChangedSelector(_:)))
+    }
+    
+    private func addSpeedSlider() {
+        addSlider(title: "Speed: ", range: (min: 0.01, max: 1, currentValue: 0.1), selector: #selector(speedValueChangedSelector(_:)))
+    }
+    
+    private func addSlider(title: String, range: (min: Float, max: Float, currentValue: Float), selector: Selector) {
+        let horizontalStackView = UIStackView()
+        horizontalStackView.axis = .horizontal
+        verticalStackView.addArrangedSubview(horizontalStackView)
+        
+        let label = UILabel()
+        label.text = title
+        label.textColor = .white
+        horizontalStackView.addArrangedSubview(label)
+        
         let slider = UISlider()
-        slider.minimumValue = 0.1
-        slider.maximumValue = 10
-        slider.value = 1
-        slider.addTarget(self, action: #selector(brushSizeValueChangedSelector), for: .valueChanged)
-        verticalStackView.addArrangedSubview(slider)
+        slider.minimumValue = range.min
+        slider.maximumValue = range.max
+        slider.value = range.currentValue
+        slider.addTarget(self, action: selector, for: .valueChanged)
+        horizontalStackView.addArrangedSubview(slider)
     }
     
     private func addButton(title: String, selector: Selector) {
@@ -71,5 +90,9 @@ final class AttributesPaneView: UIView {
     
     @objc private func brushSizeValueChangedSelector(_ slider: UISlider) {
         brushSizeValueChanged?(slider.value)
+    }
+    
+    @objc private func speedValueChangedSelector(_ slider: UISlider) {
+        speedValueChanged?(slider.value)
     }
 }
