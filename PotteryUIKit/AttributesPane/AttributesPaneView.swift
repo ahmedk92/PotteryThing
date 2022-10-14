@@ -10,6 +10,7 @@ import UIKit
 final class AttributesPaneView: UIView {
     
     var didTapDiscColorButton: (() -> Void)?
+    var didTapBrushColorButton: (() -> Void)?
     
     private var verticalStackView: UIStackView!
     
@@ -26,6 +27,7 @@ final class AttributesPaneView: UIView {
     
     private func setUpStackView() {
         verticalStackView = UIStackView()
+        verticalStackView.axis = .vertical
         verticalStackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(verticalStackView)
         NSLayoutConstraint.activate([
@@ -37,13 +39,22 @@ final class AttributesPaneView: UIView {
     }
     
     private func addDiscColorButton() {
+        addButton(title: "Disc color", selector: #selector(discColorButtonTapped))
+        addButton(title: "Brush color", selector: #selector(brushColorButtonTapped))
+    }
+    
+    private func addButton(title: String, selector: Selector) {
         let button = UIButton()
-        button.setTitle("Disc color", for: .normal)
+        button.setTitle(title, for: .normal)
         verticalStackView.addArrangedSubview(button)
-        button.addTarget(self, action: #selector(discColorButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: selector, for: .touchUpInside)
     }
     
     @objc private func discColorButtonTapped() {
         didTapDiscColorButton?()
+    }
+    
+    @objc private func brushColorButtonTapped() {
+        didTapBrushColorButton?()
     }
 }

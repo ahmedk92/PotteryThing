@@ -26,10 +26,21 @@ final class PotteryViewController: UIViewController, UIColorPickerViewController
         addAttributesPaneView()
     }
     
+    private enum ColorPickerContext {
+        case disc, brush
+    }
+    
+    private var colorPickerContext: ColorPickerContext?
+    
     private func addAttributesPaneView() {
         let attributesPanView = AttributesPaneView()
         attributesPanView.didTapDiscColorButton = { [weak self] in
-            self?.showDiscColorPicker()
+            self?.colorPickerContext = .disc
+            self?.showColorPicker()
+        }
+        attributesPanView.didTapBrushColorButton = { [weak self] in
+            self?.colorPickerContext = .brush
+            self?.showColorPicker()
         }
         attributesPanView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(attributesPanView)
@@ -41,7 +52,7 @@ final class PotteryViewController: UIViewController, UIColorPickerViewController
         ])
     }
     
-    private func showDiscColorPicker() {
+    private func showColorPicker() {
         let colorPickerViewController = UIColorPickerViewController()
         colorPickerViewController.delegate = self
         present(colorPickerViewController, animated: true)
@@ -68,6 +79,13 @@ final class PotteryViewController: UIViewController, UIColorPickerViewController
     }
     
     func colorPickerViewController(_ viewController: UIColorPickerViewController, didSelect color: UIColor, continuously: Bool) {
-        discView.discColor = color
+        switch colorPickerContext {
+        case .brush:
+            discView.brushColor = color
+        case .disc:
+            discView.discColor = color
+        default:
+            break
+        }
     }
 }
